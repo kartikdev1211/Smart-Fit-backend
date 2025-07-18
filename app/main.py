@@ -18,6 +18,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+@app.get("/")
+async def root():
+    return {
+        "message": "Welcome to Smart Fit API!",
+        "endpoints": {
+            "auth": "/auth/",
+            "user": "/user/",
+            "wardrobe": "/wardrobe/",
+            "style_tips": "/tips/"
+        },
+        "docs": "/docs",
+        "redoc": "/redoc"
+    }
 
 # Include routers
 app.include_router(auth.router)  # Already has prefix="/auth" in the router
