@@ -1,21 +1,19 @@
 from fastapi import APIRouter, HTTPException
-from app.models.user_model import UserCreate, UserLogin, UserOut
-from app.models.user_model import UserWithToken
+from app.models.user_model import UserCreate, UserLogin, UserWithToken
 from app.db.mongo import db
 from passlib.hash import bcrypt
 from app.core.jwt_handler import create_access_token
-from bson import ObjectId
 
 router = APIRouter(prefix="/auth", tags=["Auth"])
 
 @router.post("/signup", response_model=UserWithToken)
-def signup(user: UserCreate):
-    existing =  db.users.find_one({"email": user.email})   
+async def signup(user: UserCreate):
+    existing = await db.users.find_one({"email": user.email})
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered")
 
     hashed_pwd = bcrypt.hash(user.password)
-    result =  db.users.insert_one({
+    result = await db.users.insert_one({
         "full_name": user.full_name,
         "email": user.email,
         "password": hashed_pwd
@@ -34,8 +32,8 @@ def signup(user: UserCreate):
     }
 
 @router.post("/login", response_model=UserWithToken)
-def login(user: UserLogin):
-    existing =  db.users.find_one({"email": user.email})
+async def login(user: UserLogin):
+    existing = await db.users.find_one({"email": user.email})
     if not existing or not bcrypt.verify(user.password, existing["password"]):
         raise HTTPException(status_code=401, detail="Invalid Credentials")
 
