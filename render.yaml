@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: smart-fit-api
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "bash start.sh"
+    plan: free
+    branch: main
+    envVars:
+      - key: MONGO_URL
+        value: mongodb+srv://kartikkysp12:6Rg4mBmNs8wnh73t@cluster0.7hhmgql.mongodb.net/
