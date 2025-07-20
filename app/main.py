@@ -2,7 +2,7 @@
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import auth,user,wardrobe,style_tip
+from app.routes import auth,user,wardrobe,style_tip,upload
 
 app = FastAPI(
     title="Smart Fit API",
@@ -37,3 +37,4 @@ app.include_router(auth.router)  # Already has prefix="/auth" in the router
 app.include_router(user.router)
 app.include_router(wardrobe.router)
 app.include_router(style_tip.router,prefix="/tips",tags=["Style Tips"])
+app.include_router(upload.router)
