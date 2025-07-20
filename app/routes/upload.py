@@ -3,9 +3,24 @@ from app.core.deps import get_current_user
 from app.core.cloudinary_config import cloudinary
 import logging
 import traceback
+import os
 
 router = APIRouter(prefix="/upload", tags=["Upload"])
 logger = logging.getLogger(__name__)
+
+def is_valid_image_file(filename: str, content_type: str) -> bool:
+    """Check if file is a valid image based on content type and extension"""
+    # Check content type first
+    if content_type and content_type.startswith('image/'):
+        return True
+    
+    # Fallback: check file extension
+    if filename:
+        image_extensions = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.webp', '.tiff'}
+        file_ext = os.path.splitext(filename.lower())[1]
+        return file_ext in image_extensions
+    
+    return False
 
 @router.post("/image")
 async def upload_image(
@@ -19,9 +34,9 @@ async def upload_image(
         logger.info(f"Starting image upload for user: {current_user['sub']}")
         logger.info(f"File details: {file.filename}, {file.content_type}, {file.size} bytes")
         
-        # Validate file type
-        if not file.content_type.startswith('image/'):
-            logger.warning(f"Invalid file type: {file.content_type}")
+        # Validate file type with improved detection
+        if not is_valid_image_file(file.filename, file.content_type):
+            logger.warning(f"Invalid file type: {file.content_type}, filename: {file.filename}")
             raise HTTPException(status_code=400, detail="File must be an image")
         
         # Validate file size (max 10MB)
